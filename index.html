@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charakter-Manager — Schreibwerkzeug</title>
+    <meta name="description" content="Verwalte Charaktere, ihre Eigenschaften und Beziehungen für deine Geschichten.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* ============================================
+   Charakter-Manager — Design System
+   ============================================ */
+:root {
+    --bg-primary: #0f0f14;
+    --bg-secondary: #16161e;
+    --bg-tertiary: #1e1e2a;
+    --bg-elevated: #252535;
+    --bg-glass: rgba(30, 30, 50, 0.7);
+    --bg-glass-hover: rgba(40, 40, 65, 0.8);
+    --text-primary: #e8e6f0;
+    --text-secondary: #9b97b0;
+    --text-muted: #615e75;
+    --text-accent: #a78bfa;
+    --accent-primary: #6C5CE7;
+    --accent-primary-hover: #7c6ff7;
+    --accent-secondary: #00cec9;
+    --accent-danger: #ff6b6b;
+    --accent-danger-hover: #ff8787;
+    --accent-warm: #f093a0;
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-medium: rgba(255, 255, 255, 0.1);
+    --border-accent: rgba(108, 92, 231, 0.4);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 20px rgba(108, 92, 231, 0.15);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-smooth: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --rel-family: #f093a0;
+    --rel-friend: #74b9ff;
+    --rel-romance: #fd79a8;
+    --rel-enemy: #ff6b6b;
+    --rel-mentor: #a29bfe;
+    --rel-colleague: #81ecec;
+    --rel-other: #b2bec3;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Layout */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 206, 201, 0.04) 0%, transparent 60%),
+        var(--bg-primary);
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.header-left h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-left {
+    width: 380px;
+    min-width: 320px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    overflow-y: auto;
+}
+
+.panel-right {
+    flex: 1;
+    position: relative;
+    background: var(--bg-primary);
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+}
+
+.panel-header h2 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+}
+
+.btn-primary {
+    background: var(--accent-primary);
+    color: white;
+    box-shadow: 0 2px 10px rgba(108, 92, 231, 0.3);
+}
+
+.btn-primary:hover {
+    background: var(--accent-primary-hover);
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-accent {
+    background: rgba(0, 206, 201, 0.15);
+    color: var(--accent-secondary);
+    border: 1px solid rgba(0, 206, 201, 0.2);
+}
+
+.btn-accent:hover {
+    background: rgba(0, 206, 201, 0.25);
+    border-color: rgba(0, 206, 201, 0.4);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-medium);
+}
+
+.btn-ghost:hover {
+    background: var(--bg-glass-hover);
+    color: var(--text-primary);
+    border-color: var(--border-accent);
+}
+
+.btn-danger {
+    background: rgba(255, 107, 107, 0.12);
+    color: var(--accent-danger);
+    border: 1px solid rgba(255, 107, 107, 0.15);
+}
+
+.btn-danger:hover {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: rgba(255, 107, 107, 0.35);
+}
+
+.btn-icon {
+    padding: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+
+.btn-icon:hover {
+    background: var(--bg-glass-hover);
+    color: var(--text-primary);
+    border-color: var(--border-medium);
+}
+
+.btn-icon.active {
+    background: rgba(108, 92, 231, 0.15);
+    color: var(--accent-primary);
+    border-color: var(--border-accent);
+}
+
+/* Character Tabs */
+.character-tabs {
+    padding: 0 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.char-tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+    animation: fadeSlideIn 0.3s ease;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.char-tab:hover {
+    background: var(--bg-glass-hover);
+}
+
+.char-tab.active {
+    background: var(--bg-elevated);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-glow);
+}
+
+.char-tab-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px currentColor;
+}
+
+.char-tab-name {
+    font-size: 0.88rem;
+    font-weight: 500;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.char-tab-role {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* Character Detail */
+.character-detail {
+    padding: 0 20px 16px;
+    border-top: 1px solid var(--border-subtle);
+    animation: fadeIn 0.25s ease;
+}
+
+.detail-section {
+    margin-bottom: 14px;
+}
+
+.detail-section label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    margin-top: 14px;
+}
+
+.detail-section input[type="text"],
+.detail-section select,
+.detail-section textarea {
+    width: 100%;
+    padding: 9px 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: all var(--transition-fast);
+    resize: vertical;
+}
+
+.detail-section input[type="text"]:focus,
+.detail-section select:focus,
+.detail-section textarea:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.detail-section select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239b97b0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+}
+
+.detail-section select option {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.color-picker-row input[type="color"] {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    background: transparent;
+    padding: 2px;
+}
+
+.color-picker-row input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-picker-row input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+
+.color-hex-display {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    font-family: 'Courier New', monospace;
+}
+
+.detail-actions {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* Relationships */
+.relationships-section {
+    border-top: 1px solid var(--border-subtle);
+    padding-bottom: 16px;
+}
+
+.relations-list {
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.relation-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    animation: fadeSlideIn 0.3s ease;
+    transition: all var(--transition-fast);
+}
+
+.relation-item:hover {
+    border-color: var(--border-medium);
+}
+
+.relation-type-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.relation-type-dot.family {
+    background: var(--rel-family);
+    box-shadow: 0 0 6px var(--rel-family);
+}
+
+.relation-type-dot.friend {
+    background: var(--rel-friend);
+    box-shadow: 0 0 6px var(--rel-friend);
+}
+
+.relation-type-dot.romance {
+    background: var(--rel-romance);
+    box-shadow: 0 0 6px var(--rel-romance);
+}
+
+.relation-type-dot.enemy {
+    background: var(--rel-enemy);
+    box-shadow: 0 0 6px var(--rel-enemy);
+}
+
+.relation-type-dot.mentor {
+    background: var(--rel-mentor);
+    box-shadow: 0 0 6px var(--rel-mentor);
+}
+
+.relation-type-dot.colleague {
+    background: var(--rel-colleague);
+    box-shadow: 0 0 6px var(--rel-colleague);
+}
+
+.relation-type-dot.other {
+    background: var(--rel-other);
+    box-shadow: 0 0 6px var(--rel-other);
+}
+
+.relation-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.relation-names {
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.relation-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.relation-delete {
+    flex-shrink: 0;
+    padding: 4px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: all var(--transition-fast);
+    opacity: 0;
+}
+
+.relation-item:hover .relation-delete {
+    opacity: 1;
+}
+
+.relation-delete:hover {
+    color: var(--accent-danger);
+    background: rgba(255, 107, 107, 0.1);
+}
+
+/* Graph */
+.graph-toolbar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+    z-index: 5;
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+}
+
+.toolbar-separator {
+    width: 1px;
+    background: var(--border-medium);
+    margin: 2px 4px;
+}
+
+#graph-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+}
+
+#graph-canvas:active {
+    cursor: grabbing;
+}
+
+.graph-empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+    line-height: 1.8;
+}
+
+.graph-empty svg {
+    margin-bottom: 16px;
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state p {
+    font-size: 0.88rem;
+    margin-top: 8px;
+}
+
+.empty-hint {
+    font-size: 0.78rem !important;
+    opacity: 0.6;
+}
+
+.empty-small {
+    padding: 16px;
+}
+
+.empty-small p {
+    font-size: 0.8rem;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    width: 420px;
+    max-width: 90vw;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 12px;
+}
+
+.modal-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    border: none !important;
+}
+
+.modal-body {
+    padding: 0 20px;
+}
+
+.relation-arrow {
+    display: flex;
+    justify-content: center;
+    color: var(--text-muted);
+    margin: -4px 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 20px;
+}
+
+/* ============================================
+   File Attachments
+   ============================================ */
+
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    transition: all var(--transition-fast);
+}
+
+.file-item:hover {
+    border-color: var(--border-medium);
+    background: var(--bg-elevated);
+}
+
+.file-icon {
+    color: var(--text-muted);
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.file-name:hover {
+    text-decoration: underline;
+    color: var(--accent-primary);
+}
+
+.file-meta {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    margin-right: 8px;
+}
+
+.file-delete {
+    padding: 4px;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transition: all var(--transition-fast);
+}
+
+.file-item:hover .file-delete {
+    opacity: 1;
+}
+
+.file-delete:hover {
+    color: var(--accent-danger);
+    background: rgba(255, 107, 107, 0.1);
+}
+
+/* ============================================
+   Avatar
+   ============================================ */
+
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.avatar-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-medium);
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all var(--transition-fast);
+}
+
+.avatar-wrapper:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--bg-tertiary);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    color: white;
+}
+
+.avatar-wrapper:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.btn-text-danger {
+    background: none;
+    border: none;
+    color: var(--accent-danger);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.btn-text-danger:hover {
+    background: rgba(255, 107, 107, 0.1);
+}
+</style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1>✦ Charakter-Manager</h1>
+                <span class="header-subtitle">Beziehungen & Netzwerke</span>
+            </div>
+            <div class="header-actions">
+                <button id="btn-save" class="btn btn-ghost" title="Daten speichern">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Save
+                </button>
+                <button id="btn-load" class="btn btn-ghost" title="Daten laden">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Load
+                </button>
+                <button id="btn-reset" class="btn btn-danger" title="Alles zurücksetzen">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    </svg>
+                    Reset
+                </button>
+                <input type="file" id="import-file" accept=".json" style="display:none">
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: Characters -->
+            <aside class="panel panel-left">
+                <div class="panel-header">
+                    <h2>Charaktere</h2>
+                    <button id="btn-add-character" class="btn btn-primary btn-sm">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        Neu
+                    </button>
+                </div>
+
+                <!-- Character Tabs -->
+                <div class="character-tabs" id="character-tabs">
+                    <div class="empty-state" id="empty-state-chars">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" opacity="0.4">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <p>Noch keine Charaktere</p>
+                        <p class="empty-hint">Klicke „Neu" um loszulegen</p>
+                    </div>
+                </div>
+
+                <!-- Character Detail -->
+                <div class="character-detail" id="character-detail" style="display:none;">
+                    <div class="avatar-section">
+                        <div class="avatar-wrapper" id="avatar-wrapper" title="Bild ändern">
+                            <div class="avatar-placeholder" id="avatar-placeholder">?</div>
+                            <img id="avatar-img" class="avatar-img" style="display:none;">
+                            <div class="avatar-overlay">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                    <circle cx="12" cy="13" r="4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <input type="file" id="avatar-input" accept="image/*" style="display:none">
+                        <button id="btn-remove-avatar" class="btn-text-danger"
+                            style="display:none; font-size:0.75rem; margin-top:4px;">Bild entfernen</button>
+                    </div>
+
+                    <div class="detail-section">
+                        <label for="char-name">Name</label>
+                        <input type="text" id="char-name" placeholder="Name des Charakters" autocomplete="off">
+                    </div>
+                    <div class="detail-section">
+                        <label for="char-role">Rolle</label>
+                        <select id="char-role">
+                            <option value="">— Rolle wählen —</option>
+                            <option value="Protagonist">Protagonist</option>
+                            <option value="Antagonist">Antagonist</option>
+                            <option value="Deuteragonist">Deuteragonist</option>
+                            <option value="Nebenfigur">Nebenfigur</option>
+                            <option value="Mentor">Mentor</option>
+                            <option value="Verbündeter">Verbündeter</option>
+                            <option value="Sonstiges">Sonstiges</option>
+                        </select>
+                    </div>
+                    <div class="detail-section">
+                        <label for="char-faction">Fraktion / Gruppe</label>
+                        <input type="text" id="char-faction" list="faction-list"
+                            placeholder="z.B. Rebellen, Imperium..." autocomplete="off">
+                        <datalist id="faction-list"></datalist>
+                    </div>
+                    <div class="detail-section">
+                        <label for="char-color">Farbe</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="char-color" value="#6C5CE7">
+                            <span class="color-hex" id="color-hex-display">#6C5CE7</span>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <label for="char-description">Beschreibung</label>
+                        <textarea id="char-description" placeholder="Kurze Beschreibung des Charakters..."
+                            rows="3"></textarea>
+                    </div>
+                    <div class="detail-section">
+                        <label for="char-notes">Notizen</label>
+                        <textarea id="char-notes" placeholder="Freie Notizen, Ideen, Hintergrundgeschichte..."
+                            rows="4"></textarea>
+                    </div>
+                    <div class="detail-section">
+                        <label>Dateien</label>
+                        <div class="file-list" id="file-list"></div>
+                        <button id="btn-add-file" class="btn btn-ghost btn-sm"
+                            style="width:100%; margin-top:8px; justify-content:center;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                            </svg>
+                            Datei anhängen (Max 1MB)
+                        </button>
+                        <input type="file" id="file-upload" style="display:none">
+                    </div>
+                    <div class="detail-actions">
+                        <button id="btn-delete-character" class="btn btn-danger btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <path d="M10 11v6" />
+                                <path d="M14 11v6" />
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                            Charakter löschen
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Relationships Section -->
+                <div class="relationships-section" id="relationships-section" style="display:none;">
+                    <div class="panel-header">
+                        <h2>Beziehungen</h2>
+                        <button id="btn-add-relation" class="btn btn-accent btn-sm">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Verbindung
+                        </button>
+                    </div>
+                    <div class="relations-list" id="relations-list">
+                        <div class="empty-state empty-small" id="empty-state-relations">
+                            <p>Keine Beziehungen</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Panel: Graph -->
+            <main class="panel panel-right">
+                <div class="graph-toolbar">
+                    <button id="btn-zoom-in" class="btn btn-icon" title="Hineinzoomen">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            <line x1="11" y1="8" x2="11" y2="14" />
+                            <line x1="8" y1="11" x2="14" y2="11" />
+                        </svg>
+                    </button>
+                    <button id="btn-zoom-out" class="btn btn-icon" title="Herauszoomen">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            <line x1="8" y1="11" x2="14" y2="11" />
+                        </svg>
+                    </button>
+                    <button id="btn-zoom-fit" class="btn btn-icon" title="Alles anzeigen">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M15 3h6v6" />
+                            <path d="M9 21H3v-6" />
+                            <path d="M21 3l-7 7" />
+                            <path d="M3 21l7-7" />
+                        </svg>
+                    </button>
+                    <div class="toolbar-separator"></div>
+                    <button id="btn-toggle-labels" class="btn btn-icon active" title="Labels ein/aus">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 7V4h16v3" />
+                            <line x1="12" y1="4" x2="12" y2="20" />
+                            <line x1="8" y1="20" x2="16" y2="20" />
+                        </svg>
+                    </button>
+                </div>
+                <canvas id="graph-canvas"></canvas>
+                <div class="graph-empty" id="graph-empty">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
+                        opacity="0.3">
+                        <circle cx="6" cy="6" r="3" />
+                        <circle cx="18" cy="6" r="3" />
+                        <circle cx="12" cy="18" r="3" />
+                        <line x1="8.5" y1="7.5" x2="10" y2="16" stroke-dasharray="3,3" />
+                        <line x1="15.5" y1="7.5" x2="14" y2="16" stroke-dasharray="3,3" />
+                        <line x1="8" y1="5" x2="16" y2="5" stroke-dasharray="3,3" />
+                    </svg>
+                    <p>Erstelle Charaktere und Beziehungen,<br>um den Graphen zu sehen</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Relation Modal -->
+    <div class="modal-overlay" id="modal-overlay" style="display:none;">
+        <div class="modal" id="modal-add-relation">
+            <div class="modal-header">
+                <h3>Neue Beziehung</h3>
+                <button class="btn btn-icon modal-close" id="modal-close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <label for="rel-from">Von</label>
+                    <select id="rel-from"></select>
+                </div>
+                <div class="relation-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <polyline points="19 12 12 19 5 12" />
+                    </svg>
+                </div>
+                <div class="detail-section">
+                    <label for="rel-to">Zu</label>
+                    <select id="rel-to"></select>
+                </div>
+                <div class="detail-section">
+                    <label for="rel-type">Typ</label>
+                    <select id="rel-type">
+                        <option value="family">Familie</option>
+                        <option value="friend">Freundschaft</option>
+                        <option value="romance">Romanze</option>
+                        <option value="enemy">Feindschaft</option>
+                        <option value="mentor">Mentor</option>
+                        <option value="colleague">Kollege</option>
+                        <option value="other">Sonstiges</option>
+                    </select>
+                </div>
+                <div class="detail-section">
+                    <label for="rel-label">Beschreibung</label>
+                    <input type="text" id="rel-label" placeholder="z.B. Bruder, Rivale, Lehrmeister..."
+                        autocomplete="off">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="modal-cancel">Abbrechen</button>
+                <button class="btn btn-primary" id="modal-save">Erstellen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+/* ============================================
+   Charakter-Manager — Core Logic
+   ============================================ */
+
+(function () {
+    'use strict';
+
+    // --- State ---
+    let characters = [];
+    let relations = [];
+    let selectedCharId = null;
+    let editingRelationId = null; // Track if we are editing a relation
+    let showLabels = true;
+
+    // --- Graph State ---
+    let canvas, ctx;
+    let graphOffset = { x: 0, y: 0 };
+    let graphScale = 1;
+    let dragNode = null;
+    let hoverRel = null; // Helper for hover effect on edges
+    let isPanning = false;
+    let panStart = { x: 0, y: 0 };
+    let panOffsetStart = { x: 0, y: 0 };
+    let animationId = null;
+
+    const NODE_RADIUS = 28;
+    const COLORS_POOL = ['#6C5CE7', '#00cec9', '#fd79a8', '#e17055', '#00b894', '#a29bfe', '#fdcb6e', '#74b9ff', '#ff6b6b', '#55efc4'];
+
+    // --- Helpers ---
+    function uuid() {
+        return 'xxxx-xxxx'.replace(/x/g, () => ((Math.random() * 16) | 0).toString(16));
+    }
+
+    function getRelTypeColor(type) {
+        const map = { family: '#f093a0', friend: '#74b9ff', romance: '#fd79a8', enemy: '#ff6b6b', mentor: '#a29bfe', colleague: '#81ecec', other: '#b2bec3' };
+        return map[type] || map.other;
+    }
+
+    function getRelTypeLabel(type) {
+        const map = { family: 'Familie', friend: 'Freundschaft', romance: 'Romanze', enemy: 'Feindschaft', mentor: 'Mentor', colleague: 'Kollege', other: 'Sonstiges' };
+        return map[type] || type;
+    }
+
+    // --- Persistence ---
+    function saveData() {
+        localStorage.setItem('charman_characters', JSON.stringify(characters));
+        localStorage.setItem('charman_relations', JSON.stringify(relations));
+    }
+
+    function loadData() {
+        try {
+            const c = localStorage.getItem('charman_characters');
+            const r = localStorage.getItem('charman_relations');
+            if (c) characters = JSON.parse(c);
+            if (r) relations = JSON.parse(r);
+        } catch (e) { console.warn('Failed to load data', e); }
+    }
+
+    // --- Character CRUD ---
+    function addCharacter() {
+        const c = {
+            id: uuid(),
+            name: 'Neuer Charakter',
+            role: '',
+            description: '',
+            notes: '',
+            color: COLORS_POOL[characters.length % COLORS_POOL.length],
+            x: canvas.width / 2 / graphScale - graphOffset.x + (Math.random() - 0.5) * 150,
+            y: canvas.height / 2 / graphScale - graphOffset.y + (Math.random() - 0.5) * 150,
+            vx: 0, vy: 0,
+            image: null,
+            faction: '',
+            attachments: []
+        };
+        characters.push(c);
+        saveData();
+        renderTabs();
+        selectCharacter(c.id);
+        updateGraphEmpty();
+    }
+
+    function deleteCharacter(id) {
+        characters = characters.filter(c => c.id !== id);
+        relations = relations.filter(r => r.from !== id && r.to !== id);
+        saveData();
+        if (selectedCharId === id) {
+            selectedCharId = null;
+            document.getElementById('character-detail').style.display = 'none';
+            document.getElementById('relationships-section').style.display = 'none';
+        }
+        renderTabs();
+        renderRelations();
+        updateGraphEmpty();
+    }
+
+    function updateCharacter(id, field, value) {
+        const c = characters.find(ch => ch.id === id);
+        if (!c) return;
+        c[field] = value;
+        saveData();
+        if (field === 'name' || field === 'role' || field === 'color') renderTabs();
+        if (field === 'faction') populateFactionList();
+        if (field === 'name') renderRelations();
+    }
+
+    // --- Avatar ---
+    function handleAvatarSelect(e) {
+        if (!selectedCharId) return;
+        const file = e.target.files[0];
+        if (!file) return;
+
+        resizeImage(file, 300, (base64) => {
+            const c = characters.find(ch => ch.id === selectedCharId);
+            if (!c) return;
+            c.image = base64;
+            c._imgObj = null; // Forces reload in graph
+            saveData();
+            selectCharacter(selectedCharId); // Refresh UI
+        });
+        e.target.value = '';
+    }
+
+    function removeAvatar() {
+        if (!selectedCharId) return;
+        if (confirm('Bild entfernen?')) {
+            const c = characters.find(ch => ch.id === selectedCharId);
+            if (c) {
+                c.image = null;
+                c._imgObj = null;
+                saveData();
+                selectCharacter(selectedCharId);
+            }
+        }
+    }
+
+    function resizeImage(file, maxWidth, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let w = img.width;
+                let h = img.height;
+                if (w > maxWidth) {
+                    h = Math.round(h * (maxWidth / w));
+                    w = maxWidth;
+                }
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.8));
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- File Attachments ---
+    function addFile() {
+        document.getElementById('file-upload').click();
+    }
+
+    function handleFileSelect(e) {
+        if (!selectedCharId) return;
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 1024 * 1024) {
+            alert('Datei ist zu groß (Max 1MB).');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const c = characters.find(ch => ch.id === selectedCharId);
+            if (!c) return;
+            if (!c.attachments) c.attachments = [];
+
+            c.attachments.push({
+                id: uuid(),
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                data: evt.target.result,
+                date: new Date().toISOString()
+            });
+            saveData();
+            renderFiles();
+        };
+        reader.readAsDataURL(file);
+        e.target.value = ''; // Reset
+    }
+
+    function deleteFile(fileId) {
+        if (!selectedCharId) return;
+        const c = characters.find(ch => ch.id === selectedCharId);
+        if (!c || !c.attachments) return;
+
+        c.attachments = c.attachments.filter(f => f.id !== fileId);
+        saveData();
+        renderFiles();
+    }
+
+    function renderFiles() {
+        const list = document.getElementById('file-list');
+        const c = characters.find(ch => ch.id === selectedCharId);
+        list.innerHTML = '';
+
+        if (!c || !c.attachments || c.attachments.length === 0) {
+            return;
+        }
+
+        c.attachments.forEach(f => {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+
+            // Format size
+            let sizeStr = (f.size / 1024).toFixed(1) + ' KB';
+            if (f.size > 1024 * 1024) sizeStr = (f.size / (1024 * 1024)).toFixed(1) + ' MB';
+
+            item.innerHTML = `
+                <div class="file-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                </div>
+                <a href="${f.data}" download="${f.name}" class="file-name" title="Herunterladen">${escHtml(f.name)}</a>
+                <span class="file-meta">${sizeStr}</span>
+                <button class="file-delete" title="Datei löschen">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            `;
+
+            item.querySelector('.file-delete').addEventListener('click', () => {
+                if (confirm('Datei löschen?')) deleteFile(f.id);
+            });
+
+            list.appendChild(item);
+        });
+    }
+
+    // --- UI Rendering ---
+    function renderTabs() {
+        const container = document.getElementById('character-tabs');
+        const empty = document.getElementById('empty-state-chars');
+        if (characters.length === 0) {
+            container.innerHTML = '';
+            container.appendChild(empty);
+            empty.style.display = '';
+            return;
+        }
+        empty.style.display = 'none';
+        const fragment = document.createDocumentFragment();
+        characters.forEach(c => {
+            const tab = document.createElement('div');
+            tab.className = 'char-tab' + (c.id === selectedCharId ? ' active' : '');
+            tab.dataset.id = c.id;
+            tab.innerHTML = `<span class="char-tab-color" style="color:${c.color};background:${c.color}"></span>
+                <span class="char-tab-name">${escHtml(c.name)}</span>
+                <span class="char-tab-role">${escHtml(c.role)}</span>`;
+            tab.addEventListener('click', () => selectCharacter(c.id));
+            fragment.appendChild(tab);
+        });
+        container.innerHTML = '';
+        container.appendChild(fragment);
+    }
+
+    function selectCharacter(id) {
+        selectedCharId = id;
+        const c = characters.find(ch => ch.id === id);
+        if (!c) return;
+
+        document.getElementById('character-detail').style.display = '';
+        document.getElementById('relationships-section').style.display = '';
+
+        document.getElementById('char-name').value = c.name;
+        document.getElementById('char-role').value = c.role;
+        document.getElementById('char-faction').value = c.faction || '';
+        document.getElementById('char-color').value = c.color;
+        document.getElementById('color-hex-display').textContent = c.color;
+        document.getElementById('char-description').value = c.description;
+        document.getElementById('char-notes').value = c.notes;
+
+        // Avatar UI
+        const img = document.getElementById('avatar-img');
+        const ph = document.getElementById('avatar-placeholder');
+        const initials = document.getElementById('avatar-placeholder'); // Re-use
+        const removeBtn = document.getElementById('btn-remove-avatar');
+
+        if (c.image) {
+            img.src = c.image;
+            img.style.display = '';
+            ph.style.display = 'none';
+            removeBtn.style.display = '';
+        } else {
+            img.style.display = 'none';
+            ph.style.display = 'flex';
+            ph.textContent = (c.name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            removeBtn.style.display = 'none';
+        }
+
+        renderFiles();
+        renderTabs();
+        renderRelations();
+    }
+
+    function renderRelations() {
+        const list = document.getElementById('relations-list');
+        const empty = document.getElementById('empty-state-relations');
+        const charRelations = relations.filter(r => r.from === selectedCharId || r.to === selectedCharId);
+
+        if (charRelations.length === 0) {
+            list.innerHTML = '';
+            list.appendChild(empty);
+            empty.style.display = '';
+            return;
+        }
+        empty.style.display = 'none';
+        const fragment = document.createDocumentFragment();
+        charRelations.forEach(r => {
+            const other = characters.find(c => c.id === (r.from === selectedCharId ? r.to : r.from));
+            if (!other) return;
+            const item = document.createElement('div');
+            item.className = 'relation-item';
+            // Click on item opens edit modal
+            item.style.cursor = 'pointer';
+            item.onclick = () => openRelationModal(r);
+
+            item.innerHTML = `<span class="relation-type-dot ${r.type}"></span>
+                <div class="relation-info">
+                    <div class="relation-names">${escHtml(other.name)}</div>
+                    <div class="relation-label">${escHtml(r.label || getRelTypeLabel(r.type))}</div>
+                </div>
+                <button class="relation-delete" title="Löschen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+            item.querySelector('.relation-delete').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm('Beziehung löschen?')) deleteRelation(r.id);
+            });
+            fragment.appendChild(item);
+        });
+        list.innerHTML = '';
+        list.appendChild(fragment);
+    }
+
+    function deleteRelation(id) {
+        relations = relations.filter(r => r.id !== id);
+        saveData();
+        renderRelations();
+    }
+
+    function updateGraphEmpty() {
+        document.getElementById('graph-empty').style.display = characters.length === 0 ? '' : 'none';
+    }
+
+    function escHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s || '';
+        return d.innerHTML;
+    }
+
+    // --- Modal ---
+    function openRelationModal(existingRel = null) {
+        if (characters.length < 2) { alert('Mindestens 2 Charaktere nötig.'); return; }
+        const overlay = document.getElementById('modal-overlay');
+        const modalTitle = document.querySelector('#modal-add-relation h3');
+        const saveBtn = document.getElementById('modal-save');
+
+        populateRelationDropdowns();
+
+        if (existingRel) {
+            // Edit mode
+            editingRelationId = existingRel.id;
+            modalTitle.textContent = 'Beziehung bearbeiten';
+            saveBtn.textContent = 'Speichern';
+            document.getElementById('rel-from').value = existingRel.from;
+            document.getElementById('rel-to').value = existingRel.to;
+            document.getElementById('rel-type').value = existingRel.type;
+            document.getElementById('rel-label').value = existingRel.label;
+        } else {
+            // Create mode
+            editingRelationId = null;
+            modalTitle.textContent = 'Neue Beziehung';
+            saveBtn.textContent = 'Erstellen';
+            // Defaults handled in populate
+            document.getElementById('rel-label').value = '';
+            document.getElementById('rel-type').value = 'family';
+        }
+
+        overlay.style.display = '';
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').style.display = 'none';
+        editingRelationId = null;
+    }
+
+    function populateRelationDropdowns() {
+        const fromEl = document.getElementById('rel-from');
+        const toEl = document.getElementById('rel-to');
+        fromEl.innerHTML = '';
+        toEl.innerHTML = '';
+        characters.forEach(c => {
+            fromEl.innerHTML += `<option value="${c.id}">${escHtml(c.name)}</option>`;
+            toEl.innerHTML += `<option value="${c.id}">${escHtml(c.name)}</option>`;
+        });
+        if (selectedCharId && !editingRelationId) fromEl.value = selectedCharId;
+
+        // Helper to prevent selecting same char
+        const validateSelection = () => {
+            // In a more complex app, we might disable options here
+        };
+        fromEl.onchange = validateSelection;
+        toEl.onchange = validateSelection;
+
+        // Initial set if creating new
+        if (!editingRelationId) {
+            const other = characters.find(c => c.id !== fromEl.value);
+            if (other) toEl.value = other.id;
+        }
+    }
+
+    function saveRelation() {
+        const from = document.getElementById('rel-from').value;
+        const to = document.getElementById('rel-to').value;
+        const type = document.getElementById('rel-type').value;
+        const label = document.getElementById('rel-label').value.trim();
+
+        if (from === to) { alert('Bitte zwei verschiedene Charaktere wählen.'); return; }
+
+        if (editingRelationId) {
+            // Update existing
+            const r = relations.find(rel => rel.id === editingRelationId);
+            if (r) {
+                r.from = from;
+                r.to = to;
+                r.type = type;
+                r.label = label;
+            }
+        } else {
+            // Create new
+            const r = {
+                id: uuid(),
+                from, to, type, label
+            };
+            relations.push(r);
+        }
+
+        saveData();
+        closeModal();
+        renderRelations();
+    }
+
+    // --- Save / Load / Reset ---
+    function exportData() {
+        const data = JSON.stringify({ characters, relations }, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'charaktere_save.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function importData(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.characters && data.relations) {
+                    characters = data.characters;
+                    relations = data.relations;
+                    selectedCharId = null;
+                    document.getElementById('character-detail').style.display = 'none';
+                    document.getElementById('relationships-section').style.display = 'none';
+                    saveData();
+                    renderTabs();
+                    updateGraphEmpty();
+                } else {
+                    alert('Ungültiges Dateiformat.');
+                }
+            } catch (err) {
+                alert('Fehler beim Laden: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function resetData() {
+        if (!confirm('Alle Charaktere und Beziehungen wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden!')) return;
+        characters = [];
+        relations = [];
+        selectedCharId = null;
+        document.getElementById('character-detail').style.display = 'none';
+        document.getElementById('relationships-section').style.display = 'none';
+        saveData();
+        renderTabs();
+        renderRelations();
+        updateGraphEmpty();
+    }
+
+    // ============================================
+    //   Graph Engine (Canvas)
+    // ============================================
+    function initCanvas() {
+        canvas = document.getElementById('graph-canvas');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+    }
+
+    function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+        ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    }
+
+    // Force-directed layout
+    function simulateForces() {
+        const damping = 0.85;
+        const repulsion = 3500;
+        const attraction = 0.008;
+        const idealLength = 180;
+
+        characters.forEach(a => {
+            if (a._dragging) return;
+            let fx = 0, fy = 0;
+            // Repulsion between all nodes
+            characters.forEach(b => {
+                if (a.id === b.id) return;
+                let dx = a.x - b.x, dy = a.y - b.y;
+                let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                let force = repulsion / (dist * dist);
+                fx += (dx / dist) * force;
+                fy += (dy / dist) * force;
+
+                // Faction Grouping (Attract same faction)
+                if (a.faction && b.faction && a.faction === b.faction) {
+                    const fForce = 0.05;
+                    fx -= (dx / dist) * fForce;
+                    fy -= (dy / dist) * fForce;
+                }
+            });
+            // Attraction along edges
+            relations.forEach(r => {
+                let other = null;
+                if (r.from === a.id) other = characters.find(c => c.id === r.to);
+                else if (r.to === a.id) other = characters.find(c => c.id === r.from);
+                if (!other) return;
+                let dx = other.x - a.x, dy = other.y - a.y;
+                let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                let force = (dist - idealLength) * attraction;
+                fx += (dx / dist) * force;
+                fy += (dy / dist) * force;
+            });
+            // Center gravity
+            const cx = canvas.width / 2 / window.devicePixelRatio / graphScale - graphOffset.x;
+            const cy = canvas.height / 2 / window.devicePixelRatio / graphScale - graphOffset.y;
+            fx += (cx - a.x) * 0.0003;
+            fy += (cy - a.y) * 0.0003;
+
+            a.vx = (a.vx + fx) * damping;
+            a.vy = (a.vy + fy) * damping;
+            a.x += a.vx;
+            a.y += a.vy;
+        });
+    }
+
+    // --- Faction ---
+    function populateFactionList() {
+        const list = document.getElementById('faction-list');
+        const factions = [...new Set(characters.map(c => c.faction).filter(f => f))].sort();
+        list.innerHTML = factions.map(f => `<option value="${escHtml(f)}"></option>`).join('');
+    }
+
+    function drawGraph() {
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        ctx.clearRect(0, 0, w, h);
+        ctx.save();
+        ctx.translate(graphOffset.x * graphScale, graphOffset.y * graphScale);
+        ctx.scale(graphScale, graphScale);
+
+        // Draw edges
+        relations.forEach(r => {
+            const a = characters.find(c => c.id === r.from);
+            const b = characters.find(c => c.id === r.to);
+            if (!a || !b) return;
+            const color = getRelTypeColor(r.type);
+
+            // Highlight if hovering
+            const isHover = (hoverRel && hoverRel.id === r.id);
+
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = isHover ? '#fff' : color;
+            ctx.lineWidth = isHover ? 4 : 2;
+            ctx.globalAlpha = isHover ? 0.9 : 0.5;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            // Edge label
+            if (showLabels && (r.label || r.type)) {
+                const mx = (a.x + b.x) / 2;
+                const my = (a.y + b.y) / 2;
+                const text = r.label || getRelTypeLabel(r.type);
+                ctx.font = (isHover ? 'bold ' : '') + '500 11px Inter, sans-serif';
+                const tw = ctx.measureText(text).width;
+                ctx.fillStyle = isHover ? 'rgba(50,50,60,0.9)' : 'rgba(15,15,20,0.7)';
+                const pad = 4;
+                ctx.beginPath();
+                ctx.roundRect(mx - tw / 2 - pad, my - 7 - pad, tw + pad * 2, 14 + pad * 2, 4);
+                ctx.fill();
+                ctx.fillStyle = isHover ? '#ffff' : color;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, mx, my);
+            }
+        });
+
+        // Draw nodes
+        characters.forEach(c => {
+            // Glow
+            const grd = ctx.createRadialGradient(c.x, c.y, NODE_RADIUS * 0.5, c.x, c.y, NODE_RADIUS * 2);
+            grd.addColorStop(0, c.color + '30');
+            grd.addColorStop(1, 'transparent');
+            ctx.fillStyle = grd;
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, NODE_RADIUS * 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Circle
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, NODE_RADIUS, 0, Math.PI * 2);
+
+            // Image render
+            let drawnImage = false;
+            if (c.image) {
+                if (!c._imgObj) {
+                    c._imgObj = new Image();
+                    c._imgObj.src = c.image;
+                }
+                if (c._imgObj.complete && c._imgObj.naturalWidth > 0) {
+                    ctx.save();
+                    ctx.clip();
+                    ctx.drawImage(c._imgObj, c.x - NODE_RADIUS, c.y - NODE_RADIUS, NODE_RADIUS * 2, NODE_RADIUS * 2);
+                    ctx.restore();
+                    drawnImage = true;
+                }
+            }
+
+            if (!drawnImage) {
+                ctx.fillStyle = c.id === selectedCharId ? c.color : c.color + 'dd';
+                ctx.fill();
+            }
+
+            // Initials (only if no image)
+            if (!drawnImage) {
+                const initials = (c.name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                ctx.fillStyle = '#fff';
+                ctx.font = '600 13px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(initials, c.x, c.y);
+            }
+
+            ctx.strokeStyle = c.id === selectedCharId ? '#fff' : c.color;
+            ctx.lineWidth = c.id === selectedCharId ? 3 : 1.5;
+            ctx.stroke();
+
+            // Initials (Removed here, moved up)
+
+            // Name label
+            if (showLabels) {
+                ctx.font = '500 12px Inter, sans-serif';
+                ctx.fillStyle = '#e8e6f0';
+                ctx.textAlign = 'center';
+                ctx.fillText(c.name, c.x, c.y + NODE_RADIUS + 16);
+
+                if (c.faction) {
+                    ctx.font = '400 10px Inter, sans-serif';
+                    ctx.fillStyle = c.color;
+                    ctx.fillText(c.faction, c.x, c.y + NODE_RADIUS + 28);
+                }
+            }
+        });
+
+        ctx.restore();
+    }
+
+    function animationLoop() {
+        simulateForces();
+        drawGraph();
+        animationId = requestAnimationFrame(animationLoop);
+    }
+
+    // --- Graph Interaction ---
+    function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (e.clientX - rect.left) / graphScale - graphOffset.x,
+            y: (e.clientY - rect.top) / graphScale - graphOffset.y
+        };
+    }
+
+    function findNodeAt(pos) {
+        for (let i = characters.length - 1; i >= 0; i--) {
+            const c = characters[i];
+            const dx = pos.x - c.x, dy = pos.y - c.y;
+            if (dx * dx + dy * dy <= NODE_RADIUS * NODE_RADIUS * 1.5) return c;
+        }
+        return null;
+    }
+
+    function findEdgeAt(pos) {
+        // Threshold for clicking line
+        const threshold = 10 / graphScale;
+
+        for (const r of relations) {
+            const a = characters.find(c => c.id === r.from);
+            const b = characters.find(c => c.id === r.to);
+            if (!a || !b) continue;
+
+            // Distance from point to line segment
+            const dist = distToSegment(pos, a, b);
+            if (dist < threshold) return r;
+        }
+        return null;
+    }
+
+    // Helper: Distance from point p to segment v-w
+    function distToSegment(p, v, w) {
+        const l2 = distSq(v, w);
+        if (l2 == 0) return distSq(p, v);
+        let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        return Math.sqrt(distSq(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) }));
+    }
+    function distSq(v, w) { return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y); }
+
+    function setupCanvasEvents() {
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = getMousePos(e);
+
+            // Check nodes first (priority)
+            const node = findNodeAt(pos);
+            if (node) {
+                dragNode = node;
+                dragNode._dragging = true;
+                dragNode.vx = 0; dragNode.vy = 0;
+                canvas.style.cursor = 'grabbing';
+                selectCharacter(node.id);
+                return;
+            }
+
+            // Check edges
+            const edge = findEdgeAt(pos);
+            if (edge) {
+                // Optional: Select edge? For now, just maybe highlight or log
+                // Double click handles the edit
+                return;
+            }
+
+            // Pan background
+            isPanning = true;
+            panStart = { x: e.clientX, y: e.clientY };
+            panOffsetStart = { ...graphOffset };
+            canvas.style.cursor = 'move';
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const pos = getMousePos(e);
+
+            if (dragNode) {
+                dragNode.x = pos.x;
+                dragNode.y = pos.y;
+                saveData();
+            } else if (isPanning) {
+                graphOffset.x = panOffsetStart.x + (e.clientX - panStart.x) / graphScale;
+                graphOffset.y = panOffsetStart.y + (e.clientY - panStart.y) / graphScale;
+            } else {
+                // Hover Effects
+                const node = findNodeAt(pos);
+                if (node) {
+                    canvas.style.cursor = 'grab';
+                    hoverRel = null;
+                } else {
+                    const edge = findEdgeAt(pos);
+                    if (edge) {
+                        canvas.style.cursor = 'pointer';
+                        hoverRel = edge;
+                    } else {
+                        canvas.style.cursor = 'default';
+                        hoverRel = null;
+                    }
+                }
+            }
+        });
+
+        const endDrag = () => {
+            if (dragNode) {
+                dragNode._dragging = false;
+                dragNode = null;
+            }
+            isPanning = false;
+            canvas.style.cursor = 'default';
+        };
+        canvas.addEventListener('mouseup', endDrag);
+        canvas.addEventListener('mouseleave', endDrag);
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            graphScale = Math.max(0.2, Math.min(3, graphScale * delta));
+        }, { passive: false });
+
+        canvas.addEventListener('dblclick', (e) => {
+            const pos = getMousePos(e);
+            // Check edges first for double click edit
+            const edge = findEdgeAt(pos);
+            if (edge) {
+                openRelationModal(edge);
+                return;
+            }
+
+            const node = findNodeAt(pos);
+            if (node) selectCharacter(node.id);
+            else {
+                // Optional: Create char at pos?
+            }
+        });
+    }
+
+    // --- Zoom Controls ---
+    function zoomIn() { graphScale = Math.min(3, graphScale * 1.2); }
+    function zoomOut() { graphScale = Math.max(0.2, graphScale * 0.8); }
+    function zoomFit() {
+        if (characters.length === 0) return;
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        characters.forEach(c => {
+            minX = Math.min(minX, c.x); maxX = Math.max(maxX, c.x);
+            minY = Math.min(minY, c.y); maxY = Math.max(maxY, c.y);
+        });
+        const pad = 100;
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        const rangeX = (maxX - minX) + pad * 2 || 1;
+        const rangeY = (maxY - minY) + pad * 2 || 1;
+        graphScale = Math.min(w / rangeX, h / rangeY, 2);
+        graphOffset.x = -(minX - pad) + (w / graphScale - rangeX) / 2;
+        graphOffset.y = -(minY - pad) + (h / graphScale - rangeY) / 2;
+    }
+
+    // --- Event Bindings ---
+    function bindEvents() {
+        document.getElementById('btn-add-character').addEventListener('click', addCharacter);
+        document.getElementById('btn-delete-character').addEventListener('click', () => {
+            if (selectedCharId && confirm('Charakter wirklich löschen?')) deleteCharacter(selectedCharId);
+        });
+
+        // Detail fields auto-save
+        ['char-name', 'char-role', 'char-faction', 'char-description', 'char-notes'].forEach(id => {
+            const el = document.getElementById(id);
+            const field = id.replace('char-', '');
+            el.addEventListener('input', () => { if (selectedCharId) updateCharacter(selectedCharId, field, el.value); });
+        });
+        document.getElementById('char-color').addEventListener('input', (e) => {
+            if (selectedCharId) {
+                updateCharacter(selectedCharId, 'color', e.target.value);
+                document.getElementById('color-hex-display').textContent = e.target.value;
+            }
+        });
+
+        // Files
+        document.getElementById('btn-add-file').addEventListener('click', addFile);
+        document.getElementById('file-upload').addEventListener('change', handleFileSelect);
+
+        // Avatar
+        document.getElementById('avatar-wrapper').addEventListener('click', () => document.getElementById('avatar-input').click());
+        document.getElementById('avatar-input').addEventListener('change', handleAvatarSelect);
+        document.getElementById('btn-remove-avatar').addEventListener('click', removeAvatar);
+
+        // Relation modal
+        document.getElementById('btn-add-relation').addEventListener('click', () => openRelationModal());
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-cancel').addEventListener('click', closeModal);
+        document.getElementById('modal-save').addEventListener('click', saveRelation);
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        // Save/Load/Reset
+        document.getElementById('btn-save').addEventListener('click', exportData);
+        document.getElementById('btn-load').addEventListener('click', () => document.getElementById('import-file').click());
+        document.getElementById('import-file').addEventListener('change', (e) => {
+            if (e.target.files[0]) importData(e.target.files[0]);
+            e.target.value = '';
+        });
+        document.getElementById('btn-reset').addEventListener('click', resetData);
+
+        // Zoom
+        document.getElementById('btn-zoom-in').addEventListener('click', zoomIn);
+        document.getElementById('btn-zoom-out').addEventListener('click', zoomOut);
+        document.getElementById('btn-zoom-fit').addEventListener('click', zoomFit);
+        document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
+            showLabels = !showLabels;
+            e.currentTarget.classList.toggle('active', showLabels);
+        });
+    }
+
+    // --- Init ---
+    function init() {
+        loadData();
+        initCanvas();
+        setupCanvasEvents();
+        bindEvents();
+        renderTabs();
+        populateFactionList();
+        updateGraphEmpty();
+        if (characters.length > 0) {
+            graphOffset.x = canvas.width / 2 / window.devicePixelRatio;
+            graphOffset.y = canvas.height / 2 / window.devicePixelRatio;
+        }
+        animationLoop();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+})();
+
+</script>
+</body>
+
+</html>
