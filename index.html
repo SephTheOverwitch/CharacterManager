@@ -850,6 +850,362 @@ body {
 .btn-text-danger:hover {
     background: rgba(255, 107, 107, 0.1);
 }
+
+/* ============================================
+   Admin Panel
+   ============================================ */
+
+.admin-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.admin-panel {
+    width: 95vw;
+    max-width: 1100px;
+    height: 85vh;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.admin-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-right: auto;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+}
+
+.admin-tab {
+    padding: 6px 16px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.admin-tab:hover {
+    color: var(--text-primary);
+}
+
+.admin-tab.active {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.admin-body {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.admin-tab-content {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+}
+
+.admin-tab-content.active {
+    display: flex;
+}
+
+.admin-toolbar {
+    padding: 12px 20px;
+    flex-shrink: 0;
+}
+
+.admin-table-wrap {
+    flex: 1;
+    overflow: auto;
+    padding: 0 20px 20px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 10px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border-medium);
+    position: sticky;
+    top: 0;
+    background: var(--bg-secondary);
+    z-index: 1;
+}
+
+.admin-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+}
+
+.admin-table input[type="text"],
+.admin-table input[type="color"],
+.admin-table select {
+    width: 100%;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.admin-table input[type="text"]:focus,
+.admin-table select:focus {
+    border-color: var(--accent-primary);
+}
+
+.admin-table input[type="color"] {
+    width: 36px;
+    height: 30px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.admin-table select {
+    cursor: pointer;
+    appearance: none;
+}
+
+.admin-table .btn-icon {
+    border: none;
+    color: var(--text-muted);
+}
+
+.admin-table .btn-icon:hover {
+    color: var(--accent-danger);
+    background: rgba(255, 107, 107, 0.1);
+}
+
+/* ============================================
+   Mobile Tab Bar
+   ============================================ */
+
+.mobile-tabbar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-subtle);
+    z-index: 50;
+    padding: 4px 0;
+    padding-bottom: env(safe-area-inset-bottom, 4px);
+}
+
+.mobile-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.mobile-tab.active {
+    color: var(--accent-primary);
+}
+
+.mobile-tab:hover {
+    color: var(--text-primary);
+}
+
+/* ============================================
+   Responsive — Tablet (768–1024px)
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .panel-left {
+        width: 300px;
+        min-width: 260px;
+    }
+
+    .header-actions .btn span,
+    .header-actions .btn:not(.btn-icon) {
+        font-size: 0;
+    }
+
+    .header-actions .btn svg {
+        margin: 0;
+    }
+
+    .header-actions .btn:not(.btn-icon) {
+        padding: 8px;
+        font-size: 0;
+        gap: 0;
+    }
+
+    .header-actions .btn:not(.btn-icon) svg {
+        display: block;
+    }
+}
+
+/* ============================================
+   Responsive — Phone (< 768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+    .app-header {
+        padding: 8px 12px;
+    }
+
+    .header-left h1 {
+        font-size: 1rem;
+    }
+
+    .header-subtitle {
+        display: none;
+    }
+
+    .header-actions {
+        gap: 4px;
+    }
+
+    .header-actions .btn:not(.btn-icon) {
+        padding: 6px;
+        font-size: 0;
+        gap: 0;
+    }
+
+    .main-content {
+        flex-direction: column;
+        position: relative;
+    }
+
+    .panel-left {
+        width: 100%;
+        min-width: 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-left.hidden {
+        display: none;
+    }
+
+    .panel-right {
+        flex: 1;
+    }
+
+    .panel-right.hidden {
+        display: none;
+    }
+
+    .mobile-tabbar {
+        display: flex;
+    }
+
+    .app-container {
+        padding-bottom: 56px;
+    }
+
+    /* Touch-friendly tap targets */
+    .btn,
+    .btn-icon,
+    .char-tab {
+        min-height: 44px;
+    }
+
+    .char-tab {
+        padding: 12px 14px;
+    }
+
+    .detail-section input[type="text"],
+    .detail-section select,
+    .detail-section textarea {
+        padding: 12px;
+        font-size: 16px;
+        /* Prevents zoom on iOS */
+    }
+
+    /* Admin on mobile */
+    .admin-panel {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .admin-header {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .admin-table-wrap {
+        padding: 0 12px 12px;
+    }
+
+    .admin-table {
+        font-size: 0.78rem;
+    }
+
+    .admin-table input[type="text"],
+    .admin-table select {
+        font-size: 16px;
+        padding: 8px;
+    }
+
+    .modal {
+        width: 95vw;
+    }
+}
 </style>
 </head>
 
@@ -887,6 +1243,12 @@ body {
                         <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                     </svg>
                     Reset
+                </button>
+                <button id="btn-admin" class="btn btn-icon" title="Admin">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
                 </button>
                 <input type="file" id="import-file" accept=".json" style="display:none">
             </div>
@@ -1138,6 +1500,114 @@ body {
             </div>
         </div>
     </div>
+
+    <!-- Password Modal -->
+    <div class="modal-overlay" id="password-overlay" style="display:none">
+        <div class="modal" style="width:340px">
+            <div class="modal-header">
+                <h3>🔒 Admin Login</h3>
+                <button class="btn-icon modal-close" id="pw-close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <label for="admin-password">Passwort</label>
+                    <input type="password" id="admin-password" placeholder="Passwort eingeben..." autocomplete="off">
+                    <p id="pw-error" style="color:var(--accent-danger);font-size:0.78rem;margin-top:6px;display:none">
+                        Falsches Passwort!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="pw-cancel">Abbrechen</button>
+                <button class="btn btn-primary" id="pw-submit">Anmelden</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Overlay -->
+    <div class="admin-overlay" id="admin-overlay" style="display:none">
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>⚙ Admin Panel</h2>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="chars">Charaktere</button>
+                    <button class="admin-tab" data-tab="rels">Beziehungen</button>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button class="btn btn-primary" id="admin-apply">Übernehmen</button>
+                    <button class="btn btn-ghost" id="admin-close">Schließen</button>
+                </div>
+            </div>
+            <div class="admin-body">
+                <div class="admin-tab-content active" id="admin-chars">
+                    <div class="admin-toolbar">
+                        <button class="btn btn-accent btn-sm" id="admin-add-char">+ Charakter</button>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table" id="admin-chars-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Rolle</th>
+                                    <th>Fraktion</th>
+                                    <th>Farbe</th>
+                                    <th>Beschreibung</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="admin-tab-content" id="admin-rels">
+                    <div class="admin-toolbar">
+                        <button class="btn btn-accent btn-sm" id="admin-add-rel">+ Beziehung</button>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table" id="admin-rels-table">
+                            <thead>
+                                <tr>
+                                    <th>Von</th>
+                                    <th>Zu</th>
+                                    <th>Typ</th>
+                                    <th>Beschreibung</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Tab Bar -->
+    <nav class="mobile-tabbar" id="mobile-tabbar">
+        <button class="mobile-tab active" data-panel="list">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Charaktere</span>
+        </button>
+        <button class="mobile-tab" data-panel="graph">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            <span>Netzwerk</span>
+        </button>
+    </nav>
 
     <script>
 /* ============================================
@@ -2050,6 +2520,300 @@ body {
             showLabels = !showLabels;
             e.currentTarget.classList.toggle('active', showLabels);
         });
+
+        // Admin
+        document.getElementById('btn-admin').addEventListener('click', openAdminLogin);
+        document.getElementById('pw-close').addEventListener('click', closePasswordModal);
+        document.getElementById('pw-cancel').addEventListener('click', closePasswordModal);
+        document.getElementById('pw-submit').addEventListener('click', verifyPassword);
+        document.getElementById('admin-password').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') verifyPassword();
+        });
+        document.getElementById('admin-close').addEventListener('click', closeAdminPanel);
+        document.getElementById('admin-apply').addEventListener('click', applyAdminChanges);
+        document.getElementById('admin-add-char').addEventListener('click', adminAddCharRow);
+        document.getElementById('admin-add-rel').addEventListener('click', adminAddRelRow);
+
+        // Admin tabs
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('admin-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Mobile tab bar
+        document.querySelectorAll('.mobile-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.mobile-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                switchMobilePanel(tab.dataset.panel);
+            });
+        });
+    }
+
+    // ============================================
+    //   Admin Panel
+    // ============================================
+
+    const ADMIN_PASSWORD = 'admin123';
+    let adminTempChars = [];
+    let adminTempRels = [];
+
+    function openAdminLogin() {
+        document.getElementById('password-overlay').style.display = 'flex';
+        document.getElementById('admin-password').value = '';
+        document.getElementById('pw-error').style.display = 'none';
+        document.getElementById('admin-password').focus();
+    }
+
+    function closePasswordModal() {
+        document.getElementById('password-overlay').style.display = 'none';
+    }
+
+    function verifyPassword() {
+        const pw = document.getElementById('admin-password').value;
+        if (pw === ADMIN_PASSWORD) {
+            closePasswordModal();
+            openAdminPanel();
+        } else {
+            document.getElementById('pw-error').style.display = 'block';
+            document.getElementById('admin-password').select();
+        }
+    }
+
+    function openAdminPanel() {
+        // Deep-copy data so edits are non-destructive until "Apply"
+        adminTempChars = JSON.parse(JSON.stringify(characters));
+        adminTempRels = JSON.parse(JSON.stringify(relations));
+        renderAdminCharsTable();
+        renderAdminRelsTable();
+        document.getElementById('admin-overlay').style.display = 'flex';
+    }
+
+    function closeAdminPanel() {
+        document.getElementById('admin-overlay').style.display = 'none';
+    }
+
+    function renderAdminCharsTable() {
+        const tbody = document.querySelector('#admin-chars-table tbody');
+        tbody.innerHTML = '';
+        adminTempChars.forEach((c, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="${esc(c.name)}" data-field="name"></td>
+                <td><input type="text" value="${esc(c.role || '')}" data-field="role"></td>
+                <td><input type="text" value="${esc(c.faction || '')}" data-field="faction"></td>
+                <td><input type="color" value="${c.color || '#6C5CE7'}" data-field="color"></td>
+                <td><input type="text" value="${esc(c.description || '')}" data-field="description"></td>
+                <td><button class="btn-icon admin-del-row" data-index="${i}" title="Löschen">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button></td>
+            `;
+            tr.querySelectorAll('input').forEach(inp => {
+                inp.addEventListener('input', () => {
+                    adminTempChars[i][inp.dataset.field] = inp.value;
+                });
+            });
+            tr.querySelector('.admin-del-row').addEventListener('click', () => {
+                adminTempChars.splice(i, 1);
+                renderAdminCharsTable();
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    function esc(s) {
+        return (s || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    }
+
+    function renderAdminRelsTable() {
+        const tbody = document.querySelector('#admin-rels-table tbody');
+        tbody.innerHTML = '';
+        const types = ['family', 'friend', 'romance', 'enemy', 'mentor', 'colleague', 'other'];
+        const typeLabels = { family: 'Familie', friend: 'Freundschaft', romance: 'Romanze', enemy: 'Feindschaft', mentor: 'Mentor', colleague: 'Kollege', other: 'Sonstiges' };
+
+        adminTempRels.forEach((r, i) => {
+            const tr = document.createElement('tr');
+            const fromChar = adminTempChars.find(c => c.id === r.from);
+            const toChar = adminTempChars.find(c => c.id === r.to);
+
+            const charOptions = adminTempChars.map(c =>
+                `<option value="${c.id}">${esc(c.name)}</option>`
+            ).join('');
+
+            const typeOptions = types.map(t =>
+                `<option value="${t}" ${r.type === t ? 'selected' : ''}>${typeLabels[t]}</option>`
+            ).join('');
+
+            tr.innerHTML = `
+                <td><select data-field="from">${charOptions}</select></td>
+                <td><select data-field="to">${charOptions}</select></td>
+                <td><select data-field="type">${typeOptions}</select></td>
+                <td><input type="text" value="${esc(r.label || '')}" data-field="label"></td>
+                <td><button class="btn-icon admin-del-row" data-index="${i}" title="Löschen">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button></td>
+            `;
+
+            // Set select values
+            const fromSelect = tr.querySelector('[data-field="from"]');
+            const toSelect = tr.querySelector('[data-field="to"]');
+            if (fromChar) fromSelect.value = r.from;
+            if (toChar) toSelect.value = r.to;
+
+            tr.querySelectorAll('input, select').forEach(inp => {
+                inp.addEventListener('change', () => {
+                    adminTempRels[i][inp.dataset.field] = inp.value;
+                });
+                inp.addEventListener('input', () => {
+                    adminTempRels[i][inp.dataset.field] = inp.value;
+                });
+            });
+            tr.querySelector('.admin-del-row').addEventListener('click', () => {
+                adminTempRels.splice(i, 1);
+                renderAdminRelsTable();
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    function adminAddCharRow() {
+        const id = 'char-' + Date.now();
+        adminTempChars.push({
+            id, name: 'Neuer Charakter', role: '', faction: '',
+            color: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'),
+            description: '', notes: '',
+            x: 200 + Math.random() * 200, y: 200 + Math.random() * 200,
+            vx: 0, vy: 0
+        });
+        renderAdminCharsTable();
+    }
+
+    function adminAddRelRow() {
+        if (adminTempChars.length < 2) {
+            alert('Mindestens 2 Charaktere benötigt.');
+            return;
+        }
+        adminTempRels.push({
+            id: 'rel-' + Date.now(),
+            from: adminTempChars[0].id,
+            to: adminTempChars[1].id,
+            type: 'other',
+            label: ''
+        });
+        renderAdminRelsTable();
+    }
+
+    function applyAdminChanges() {
+        characters = adminTempChars;
+        relations = adminTempRels;
+        selectedCharId = null;
+        document.getElementById('character-detail').style.display = 'none';
+        document.getElementById('relationships-section').style.display = 'none';
+        saveData();
+        renderTabs();
+        renderRelations();
+        updateGraphEmpty();
+        populateFactionList();
+        closeAdminPanel();
+    }
+
+    // ============================================
+    //   Touch Events for Mobile Canvas
+    // ============================================
+
+    let touchStartDist = 0;
+    let touchStartScale = 1;
+
+    function setupTouchEvents() {
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 2) {
+                // Pinch start
+                touchStartDist = getTouchDist(e.touches);
+                touchStartScale = graphScale;
+            } else if (e.touches.length === 1) {
+                const pos = getTouchPos(e.touches[0]);
+                const node = findNodeAt(pos);
+                if (node) {
+                    dragNode = node;
+                    dragNode._dragging = true;
+                    dragNode.vx = 0; dragNode.vy = 0;
+                    selectCharacter(node.id);
+                } else {
+                    isPanning = true;
+                    panStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    panOffsetStart = { ...graphOffset };
+                }
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 2) {
+                const dist = getTouchDist(e.touches);
+                graphScale = Math.max(0.2, Math.min(3, touchStartScale * (dist / touchStartDist)));
+            } else if (e.touches.length === 1) {
+                if (dragNode) {
+                    const pos = getTouchPos(e.touches[0]);
+                    dragNode.x = pos.x;
+                    dragNode.y = pos.y;
+                    saveData();
+                } else if (isPanning) {
+                    graphOffset.x = panOffsetStart.x + (e.touches[0].clientX - panStart.x) / graphScale;
+                    graphOffset.y = panOffsetStart.y + (e.touches[0].clientY - panStart.y) / graphScale;
+                }
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (dragNode) {
+                dragNode._dragging = false;
+                dragNode = null;
+            }
+            isPanning = false;
+        });
+    }
+
+    function getTouchPos(touch) {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const cssX = touch.clientX - rect.left;
+        const cssY = touch.clientY - rect.top;
+        return {
+            x: cssX / graphScale - graphOffset.x,
+            y: cssY / graphScale - graphOffset.y
+        };
+    }
+
+    function getTouchDist(touches) {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    // ============================================
+    //   Mobile Panel Toggle
+    // ============================================
+
+    function switchMobilePanel(panel) {
+        const left = document.querySelector('.panel-left');
+        const right = document.querySelector('.panel-right');
+        if (panel === 'list') {
+            left.classList.remove('hidden');
+            right.classList.add('hidden');
+        } else {
+            left.classList.add('hidden');
+            right.classList.remove('hidden');
+            // Re-init canvas size when switching to graph
+            setTimeout(() => {
+                canvas.width = canvas.parentElement.clientWidth * (window.devicePixelRatio || 1);
+                canvas.height = canvas.parentElement.clientHeight * (window.devicePixelRatio || 1);
+            }, 50);
+        }
     }
 
     // --- Init ---
@@ -2057,6 +2821,7 @@ body {
         loadData();
         initCanvas();
         setupCanvasEvents();
+        setupTouchEvents();
         bindEvents();
         renderTabs();
         populateFactionList();
@@ -2066,6 +2831,11 @@ body {
             graphOffset.y = canvas.height / 2 / window.devicePixelRatio;
         }
         animationLoop();
+
+        // On mobile, default to character list
+        if (window.innerWidth <= 768) {
+            switchMobilePanel('list');
+        }
     }
 
     document.addEventListener('DOMContentLoaded', init);
